@@ -4,3 +4,4 @@ build/
 *.db-shm
 .vscode/
 .idea/
+dist/
