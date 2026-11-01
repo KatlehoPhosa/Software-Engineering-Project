@@ -59,6 +59,6 @@
 ## 5. Measured results (this build)
 
 * 43 automated tests, all passing; also clean under AddressSanitizer + UndefinedBehaviourSanitizer.
-* Line coverage of business logic (`src/domain`, `src/service`, `src/common`): 86.8 %; whole `src/`: 71.1 %.
+* Phase 5 estimated business-logic line coverage: 84.83% (688 of 811 executable lines, based on rounded gcov summaries; approximate).
 * `cppcheck` (warning, style, performance, portability): no findings.
-* About 4,150 lines of source and 630 lines of tests.
+* CLOC measured 3,947 code lines across the analysed `src` and `tests` directories.
