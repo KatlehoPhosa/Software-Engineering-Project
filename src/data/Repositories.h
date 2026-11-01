@@ -170,7 +170,7 @@ public:
     virtual std::vector<MarkRow> listForStudent(int studentId, bool onlyReleased) = 0;
 };
 
-/// Append-only: there is deliberately no update or delete (Phase 3, AUDIT_ENTRY rules).
+/// Append-only: there is deliberately no update or delete (AUDIT_ENTRY rules).
 class IAuditRepository {
 public:
     virtual ~IAuditRepository() = default;

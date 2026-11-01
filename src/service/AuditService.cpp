@@ -7,7 +7,7 @@
 namespace lms {
 
 void AuditService::onMarkEvent(const MarkEvent& e) {
-    // entity_id has no foreign key (Phase 3), so the reference is checked here.
+    // entity_id has no foreign key, so the reference is checked here.
     if (!marks_.findById(e.markId)) throw NotFoundError("Cannot audit: mark does not exist.");
     const std::string reason = validation::requireNonBlank(e.reason, "Reason", 500);
     audit_.append(AuditEntry(0, "Mark", e.markId, e.oldValue, e.newValue, e.actorId, e.when, reason));

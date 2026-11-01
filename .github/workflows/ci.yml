@@ -1,0 +1,37 @@
+
+name: LMS CI
+
+on:
+  push:
+    branches:
+      - main
+      - phase6-configuration-management
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    name: Build, test and analyse
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake g++ pkg-config libsqlite3-dev libsodium-dev cppcheck
+
+      - name: Configure project
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DLMS_BUILD_TESTS=ON
+
+      - name: Build project
+        run: cmake --build build --parallel
+
+      - name: Run GoogleTests
+        run: ctest --test-dir build --output-on-failure
+
+      - name: Run Cppcheck
+        run: cppcheck --enable=warning,style,performance,portability --std=c++17 --suppress=missingIncludeSystem -I src --error-exitcode=1 src

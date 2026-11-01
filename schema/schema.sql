@@ -1,6 +1,6 @@
 -- =====================================================
 -- LEARNING MANAGEMENT SYSTEM (LMS)
--- SQLite schema matching the Phase 3 data dictionary
+-- SQLite schema matching the data dictionary
 -- =====================================================
 PRAGMA foreign_keys = ON;
 
