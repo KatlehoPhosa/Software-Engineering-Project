@@ -83,8 +83,12 @@ private:
         for (const auto& v : list) {
             con_.println("  [" + std::to_string(v.assignment.id()) + "] " + v.assignment.courseCode() + " - " +
                          v.assignment.title());
-            con_.println("       due " + con_.local(v.assignment.deadline()) + "  max " +
-                         Console::money(v.assignment.maxMark()) + "  status: " + label(v.stage));
+            std::string due = "       due " + con_.local(v.effectiveDeadline());
+            if (v.extraDays > 0)
+                due += " (extended by " + std::to_string(v.extraDays) + " day(s); original: " +
+                       con_.local(v.assignment.deadline()) + ")";
+            due += "  max " + Console::money(v.assignment.maxMark()) + "  status: " + label(v.stage);
+            con_.println(due);
         }
         return list;
     }
@@ -173,14 +177,30 @@ private:
         const std::string code = pickCourse(u);
         printAssignments(sys_.assignmentService.assignmentsOfCourse(u, code));
         const int aid = con_.promptInt("Assignment number", 1, 1000000);
-        con_.heading("Enrolled students");
-        for (const auto& s : sys_.assignmentService.studentsOfCourse(u, code))
-            con_.println("  [" + std::to_string(s.id) + "] " + s.studentNo + "  " + s.username);
-        const int sid = con_.promptInt("Student id (the number in brackets)", 1, 1000000);
+
+        con_.heading("Extension scope");
+        con_.println("  1. Individual student");
+        con_.println("  2. Whole class");
+        const int scope = con_.promptInt("Choose extension scope", 1, 2);
+
+        int studentId = 0;
+        if (scope == 1) {
+            con_.heading("Enrolled students");
+            for (const auto& student : sys_.assignmentService.studentsOfCourse(u, code))
+                con_.println("  [" + std::to_string(student.id) + "] " + student.studentNo + "  " + student.username);
+            studentId = con_.promptInt("Student id (the number in brackets)", 1, 1000000);
+        }
+
         const int days = con_.promptInt("Extra days (1-30)", 1, 30);
         const std::string why = con_.prompt("Reason for the extension");
-        sys_.assignmentService.grantExtension(u, aid, sid, days, why);
-        con_.println("Extension of " + std::to_string(days) + " day(s) granted.");
+
+        if (scope == 1) {
+            sys_.assignmentService.grantExtension(u, aid, studentId, days, why);
+            con_.println("Extension of " + std::to_string(days) + " day(s) granted to the student.");
+        } else {
+            sys_.assignmentService.grantClassExtension(u, aid, days, why);
+            con_.println("Extension of " + std::to_string(days) + " day(s) granted to the whole class.");
+        }
     }
 
     void mark(const User& u) {

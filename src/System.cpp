@@ -11,7 +11,7 @@ System::System(data::Database& db, IClock& clock, const IPasswordHasher& hasher,
       accounts(users, departments, tx, factory, hasher),
       catalog(departments, courses, teaching, enrollments, users, tx),
       assignmentService(assignments, courses, teaching, enrollments, extensions, clock, tx),
-      portal(enrollments, assignments, submissions, marks),
+      portal(enrollments, assignments, submissions, marks, extensions),
       submissionService(submissions, assignments, enrollments, extensions, *penalty, clock, tx),
       marking(submissions, marks, assignments, extensions, teaching, *penalty, events, clock, tx),
       moderation(marks, events, clock, tx) {

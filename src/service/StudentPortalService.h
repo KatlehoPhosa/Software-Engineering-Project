@@ -11,14 +11,16 @@ struct AssignmentView {
     Assignment assignment;
     std::optional<Submission> submission;
     LifecycleStage stage = LifecycleStage::NotSubmitted;
+    int extraDays = 0;
+    DateTime effectiveDeadline() const { return assignment.deadline().addDays(extraDays); }
 };
 
 /// FR-07 and FR-11: read-only views for students.
 class StudentPortalService {
 public:
     StudentPortalService(IEnrollmentRepository& enrol, IAssignmentRepository& assignments,
-                         ISubmissionRepository& submissions, IMarkRepository& marks)
-        : enrol_(enrol), assignments_(assignments), submissions_(submissions), marks_(marks) {}
+                         ISubmissionRepository& submissions, IMarkRepository& marks, IExtensionRepository& extensions)
+        : enrol_(enrol), assignments_(assignments), submissions_(submissions), marks_(marks), extensions_(extensions) {}
 
     std::vector<Course> myCourses(const User& actor);
     /// Only assignments of courses the student is enrolled in.
@@ -31,6 +33,7 @@ private:
     IAssignmentRepository& assignments_;
     ISubmissionRepository& submissions_;
     IMarkRepository& marks_;
+    IExtensionRepository& extensions_;
 };
 
 }  // namespace lms

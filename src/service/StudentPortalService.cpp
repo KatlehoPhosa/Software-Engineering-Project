@@ -20,6 +20,8 @@ std::vector<AssignmentView> StudentPortalService::myAssignments(const User& acto
     for (const auto& c : enrol_.coursesOfStudent(actor.id())) {
         for (const auto& a : assignments_.listByCourse(c.code())) {
             AssignmentView v{a, std::nullopt, LifecycleStage::NotSubmitted};
+            const auto extension = extensions_.find(actor.id(), a.id());
+            if (extension) v.extraDays = extension->extraDays();
             auto it = mine.find(a.id());
             if (it != mine.end()) {
                 v.submission = it->second;

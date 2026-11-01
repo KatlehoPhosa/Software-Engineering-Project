@@ -18,6 +18,7 @@ public:
     int createAssignment(const User& actor, const std::string& courseCode, const std::string& title,
                          DateTime deadline, double maxMark);
     int grantExtension(const User& actor, int assignmentId, int studentId, int extraDays, const std::string& reason);
+    int grantClassExtension(const User& actor, int assignmentId, int extraDays, const std::string& reason);
 
     std::vector<Course> myCourses(const User& actor);
     std::vector<StudentInfo> studentsOfCourse(const User& actor, const std::string& courseCode);
