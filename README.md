@@ -1,4 +1,4 @@
-# Moderated Learning Management System (LMS) - v1.0.0
+# Moderated Learning Management System (LMS) 
 
 CS4433 Software Engineering - Final Project, Phase 4 (Implementation).
 A C++17 console application for a secondary school: courses, assignments, submissions, marking,
