@@ -5,7 +5,7 @@
 namespace lms {
 
 /// A UTC instant with one-second resolution.
-/// Stored in the database as TEXT 'YYYY-MM-DD HH:MM:SS' (Phase 3 data dictionary).
+/// Stored in the database as TEXT 'YYYY-MM-DD HH:MM:SS' (data dictionary).
 /// Implemented without timegm()/gmtime() so behaviour is identical on every platform.
 class DateTime {
 public:

@@ -1,6 +1,5 @@
 # Moderated Learning Management System (LMS) - v1.0.0
 
-CS4433 Software Engineering - Final Project, Phase 4 (Implementation).
 A C++17 console application for a secondary school: courses, assignments, submissions, marking,
 **Head-of-Department moderation before release**, and a full audit log of mark changes.
 It works completely offline (embedded SQLite, no network).
@@ -28,7 +27,7 @@ cmake --build build -j
 
 CMake options: `-DLMS_BUILD_TESTS=OFF` (skip tests), `-DLMS_WARNINGS_AS_ERRORS=ON`, `-DLMS_COVERAGE=ON`.
 `schema/schema.sql` is embedded into the program at build time, so the code and the approved
-Phase 3 schema cannot drift apart.
+schema cannot drift apart.
 
 ## 3. Run
 
@@ -56,7 +55,7 @@ Coverage (GCC): `cmake -S . -B cov -DCMAKE_BUILD_TYPE=Debug -DLMS_COVERAGE=ON &&
 
 Static analysis: `cppcheck --enable=warning,style,performance,portability --std=c++17 -I src src`
 
-## 5. Source layout (layered architecture, Phase 3 section 3.1)
+## 5. Source layout (layered architecture)
 
 ```
 src/common/        DateTime (UTC, portable), Clock (testable time), Validation, Exceptions
@@ -67,7 +66,7 @@ src/security/      IPasswordHasher + SodiumPasswordHasher (Argon2id)
 src/service/       Use-case services, access control, audit (Observer), notifications (Observer)
 src/presentation/  Console, role menus, Application loop
 src/System.*       Composition root (the only place concrete classes are wired together)
-schema/schema.sql  The Phase 3 SQL schema, unchanged
+schema/schema.sql  The SQL schema
 tests/             GoogleTest suite
 docs/              Implementation notes, coding standard
 ```

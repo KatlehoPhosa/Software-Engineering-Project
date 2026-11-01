@@ -5,3 +5,16 @@ build/
 .vscode/
 .idea/
 dist/
+
+# Coverage and compiler-generated files
+*.gcov
+*.gcda
+*.gcno
+*.gcov.json
+*.gcov.json.gz
+*.gch
+build-coverage/
+
+# Coverage test output
+business-coverage-raw.txt
+Software-Engineering-Project/

@@ -157,7 +157,7 @@ private:
     MarkState state_;
 };
 
-/// Combined view of Submission + Mark used by the state machine of Phase 3.
+/// Combined view of Submission + Mark used by the state machine of the design.
 enum class LifecycleStage { NotSubmitted, Submitted, Late, Resubmitted, Marked, Moderated, Released };
 LifecycleStage lifecycleOf(const Submission* submission, const Mark* mark);
 std::string label(LifecycleStage s);
