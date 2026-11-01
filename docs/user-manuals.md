@@ -235,11 +235,11 @@ Select **Grant Extension**.
 
 1. Select the relevant course.
 2. Select the assignment number.
-3. Review the enrolled students.
-4. Enter the student's ID.
+3. Choose the extension scope: **Individual student** or **Whole class**.
+4. For an individual extension, review the enrolled students and enter the student's ID. For a whole-class extension, the system applies the extension to all currently enrolled students.
 5. Enter the number of extra days (1–30).
 6. Enter the reason for the extension.
-7. The system confirms the extension.
+7. The system confirms the extension. A whole-class request is applied as one operation; it is rejected if the class has no enrolled students or any student already has an extension for that assignment.
 
 Only grant extensions when authorised by school policy.
 
@@ -293,11 +293,11 @@ The system displays your assignments, including:
 - Assignment number.
 - Course code.
 - Assignment title.
-- Submission deadline.
+- Effective submission deadline.
 - Maximum mark.
 - Current submission status.
 
-Check deadlines regularly.
+If an extension applies, the list also shows the extra days granted and the original deadline. Check the effective deadline regularly and submit your work before it.
 
 ### 6.4 Submitting an assignment
 

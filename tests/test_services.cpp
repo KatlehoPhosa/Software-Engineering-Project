@@ -61,6 +61,31 @@ TEST(Extension, Rules) {
     EXPECT_NO_THROW(s.grantExtension(*w.lecturer, w.assignmentId, w.alice->id(), 2, "illness"));
     EXPECT_THROW(s.grantExtension(*w.lecturer, w.assignmentId, w.alice->id(), 3, "again"), BusinessRuleError);
 }
+TEST(Extension, ClassWideAppliesToEveryEnrolledStudentAndAppearsInPortal) {
+    World w;
+    EXPECT_GT(w.sys.assignmentService.grantClassExtension(*w.lecturer, w.assignmentId, 3, "class circumstances"), 0);
+
+    for (const User* student : {w.alice.get(), w.bob.get()}) {
+        auto rows = w.sys.portal.myAssignments(*student);
+        ASSERT_EQ(rows.size(), 1u);
+        EXPECT_EQ(rows[0].extraDays, 3);
+        EXPECT_GT(rows[0].effectiveDeadline(), rows[0].assignment.deadline());
+    }
+
+    w.clock.set(World::deadline().addDays(1));
+    EXPECT_EQ(w.sys.submissionService.submit(*w.alice, w.assignmentId, "a.pdf").state, SubmissionState::Submitted);
+    EXPECT_EQ(w.sys.submissionService.submit(*w.bob, w.assignmentId, "b.pdf").state, SubmissionState::Submitted);
+}
+
+TEST(Extension, ClassWideRequestIsRejectedIfAnyStudentAlreadyHasAnExtension) {
+    World w;
+    w.sys.assignmentService.grantExtension(*w.lecturer, w.assignmentId, w.alice->id(), 2, "individual request");
+    EXPECT_THROW(w.sys.assignmentService.grantClassExtension(*w.lecturer, w.assignmentId, 3, "class circumstances"), BusinessRuleError);
+
+    w.clock.set(World::deadline().addDays(1));
+    EXPECT_EQ(w.sys.submissionService.submit(*w.bob, w.assignmentId, "b.pdf").state, SubmissionState::Late);
+}
+
 TEST(Assignment, CreationRules) {
     World w;
     auto& s = w.sys.assignmentService;

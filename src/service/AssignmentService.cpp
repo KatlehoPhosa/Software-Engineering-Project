@@ -42,6 +42,44 @@ int AssignmentService::grantExtension(const User& actor, int assignmentId, int s
     return id;
 }
 
+
+int AssignmentService::grantClassExtension(const User& actor, int assignmentId, int extraDays,
+                                           const std::string& reason) {
+    requireAction(actor, Action::GrantExtension);
+    if (extraDays < 1 || extraDays > kMaxExtensionDays)
+        throw ValidationError("An extension must be between 1 and 30 days.");
+    const std::string why = validation::requireNonBlank(reason, "Reason", 500);
+
+    auto tx = tx_.begin();
+    auto a = assignments_.find(assignmentId);
+    if (!a) throw NotFoundError("Assignment not found.");
+    if (!teaching_.isAssigned(actor.id(), a->courseCode()))
+        throw AuthorizationError("You are not assigned to that course.");
+
+    const auto students = enrol_.studentsOfCourse(a->courseCode());
+    if (students.empty()) throw BusinessRuleError("There are no enrolled students in this class.");
+
+    // Pre-check everyone before inserting, so an existing extension rejects the whole request.
+    for (const auto& student : students) {
+        if (extensions_.find(student.id, assignmentId))
+            throw BusinessRuleError("At least one student already has an extension for this assignment.");
+    }
+
+    int firstId = 0;
+    try {
+        for (const auto& student : students) {
+            const int id = extensions_.add(
+                Extension(0, student.id, assignmentId, extraDays, actor.id(), why));
+            if (firstId == 0) firstId = id;
+        }
+    } catch (const ConstraintViolation&) {
+        throw BusinessRuleError("The class extension could not be saved; no changes were committed.");
+    }
+
+    tx->commit();
+    return firstId;
+}
+
 std::vector<Course> AssignmentService::myCourses(const User& actor) {
     requireAction(actor, Action::ViewTeachingCourses);
     return teaching_.coursesOfLecturer(actor.id());

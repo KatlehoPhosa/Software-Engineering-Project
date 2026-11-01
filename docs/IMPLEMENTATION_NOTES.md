@@ -24,8 +24,8 @@
 4. **Submission states vs the state diagram.** The approved schema keeps `submission.state` in {SUBMITTED, LATE, RESUBMITTED, MARKED} and `mark.state` in {PROVISIONAL, MODERATED, RELEASED}. The diagram's MODERATED and RELEASED states are therefore *derived* from the mark (`lifecycleOf`). The schema was not changed.
 5. **Moderation** may approve a mark unchanged or adjust the *final* mark (reason mandatory, range 0..max). The lecturer's raw mark is never overwritten. A lecturer can re-mark only while the mark is PROVISIONAL (reason mandatory).
 6. **Resubmission** is allowed only before the student's effective deadline and before marking; the row is updated in place (state RESUBMITTED), as in the data dictionary.
-7. **Extensions**: 1-30 days, one per student per assignment (v1.0), reason mandatory, lecturer must teach the course and the student must be enrolled.
-8. **Student assignment list shows the original deadline only** in v1.0. Lateness is still judged against the extended deadline, and the submit confirmation tells the student their real deadline. Showing extensions in the list is left for change request CR1 (Phase 8).
+7. **Extensions (v1.1)**: 1-30 days, one per student per assignment, reason mandatory. A lecturer may grant an individual extension or a whole-class extension. A whole-class request creates one extension record for every currently enrolled student. It is all-or-nothing: an empty class or any existing extension causes the request to be rejected before changes are committed. The lecturer must teach the course.
+8. **Student assignment list (v1.1)**: displays the effective deadline. If an extension applies, it also displays the number of extra days and the original deadline. Submission and resubmission continue to use the effective deadline.
 9. **Written feedback is mandatory** when marking (student representative's requirement; FR-09), although the column is nullable.
 10. **Notifications** (`StudentNotifier`) are in memory for the running session: the approved schema has no notification table.
 11. **Submission file** is stored as a reference (path); the file itself is not copied by the LMS. The console warns if the path does not exist.
@@ -42,12 +42,12 @@
 | FR-04 departments/courses | `CatalogService` | `Accounts.CannotDeleteUserWithRecords` (partial: add catalog CRUD tests) |
 | FR-05 assign/enrol | `CatalogService`, `Sqlite{Teaching,Enrollment}Repository` | used by `World` fixture (add direct tests) |
 | FR-06/12 create assignment | `AssignmentService::createAssignment` | `Assignment.CreationRules` |
-| FR-07 student views | `StudentPortalService` | `Portal.*` |
-| FR-08 submit/resubmit | `SubmissionService`, `Submission` | `Submit.*`, `SubmissionLifecycle.*`, `LateDays.*` |
+| FR-07 student views | `StudentPortalService`, `AssignmentView::effectiveDeadline` | `Portal.*`, `Extension.ClassWideAppliesToEveryEnrolledStudentAndAppearsInPortal` |
+| FR-08 submit/resubmit | `SubmissionService`, `Submission` | `Submit.*`, `SubmissionLifecycle.*`, `LateDays.*`, `Extension.ClassWideAppliesToEveryEnrolledStudentAndAppearsInPortal` |
 | FR-09 mark + feedback | `MarkingService`, `Mark` | `Marking.*`, `Penalty.*` |
 | FR-10 moderate/release | `ModerationService` | `Moderation.*` |
 | FR-11 released marks only | `SqliteMarkRepository::listForStudent`, `StudentPortalService` | `Moderation.StudentsSeeNothingUntilReleased` |
-| (extension) | `AssignmentService::grantExtension` | `Extension.Rules`, `Submit.Extension...` |
+| (extension) | `AssignmentService::grantExtension`, `AssignmentService::grantClassExtension` | `Extension.Rules`, `Extension.ClassWide*`, `Submit.ExtensionMovesTheDeadlineForThatStudentOnly` |
 | (audit) | `AuditService`, `SqliteAuditRepository` | `Marking.RemarkNeedsReason...`, `Moderation.FailedAuditRollsTheWholeChangeBack` |
 | NFR-01 performance | indexes, prepared statements | `Performance.*` (800 students, < 2 s) |
 | NFR-02 offline | embedded SQLite, no network code | by construction (no socket code) |
@@ -58,7 +58,7 @@
 
 ## 5. Measured results (this build)
 
-* 43 automated tests, all passing; also clean under AddressSanitizer + UndefinedBehaviourSanitizer.
+* 45 automated tests, all passing in the Phase 8 regression run. The earlier sanitizer result applies to the previously tested build.
 * Phase 5 estimated business-logic line coverage: 84.83% (688 of 811 executable lines, based on rounded gcov summaries; approximate).
 * `cppcheck` (warning, style, performance, portability): no findings.
 * CLOC measured 3,947 code lines across the analysed `src` and `tests` directories.
