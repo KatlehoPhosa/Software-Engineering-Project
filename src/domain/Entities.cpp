@@ -22,13 +22,13 @@ Submission Submission::createNew(int studentId, int assignmentId, DateTime now, 
     return Submission(0, studentId, assignmentId, now, std::move(fileRef), st);
 }
 
-void Submission::resubmit(DateTime now, DateTime effectiveDeadline, std::string fileRef) {
+void Submission::resubmit(DateTime now, DateTime effectiveDeadline, std::string fileReference) {
     if (state_ == SubmissionState::Marked)
         throw BusinessRuleError("This work has already been marked and can no longer be resubmitted.");
     if (now > effectiveDeadline)
         throw BusinessRuleError("The deadline has passed: resubmission is only allowed before the deadline.");
     submittedAt_ = now;
-    fileRef_ = std::move(fileRef);
+    fileRef_ = std::move(fileReference);
     state_ = SubmissionState::Resubmitted;
 }
 
@@ -38,11 +38,11 @@ Mark Mark::provisional(int submissionId, double rawMark, std::string feedback) {
     return Mark(0, submissionId, rawMark, std::nullopt, std::move(feedback), MarkState::Provisional);
 }
 
-void Mark::remark(double rawMark, std::string feedback) {
+void Mark::remark(double rawMarkValue, std::string feedbackText) {
     if (state_ != MarkState::Provisional)
         throw BusinessRuleError("This mark is already moderated; only the Head of Department can change it.");
-    rawMark_ = rawMark;
-    feedback_ = std::move(feedback);
+    rawMark_ = rawMarkValue;
+    feedback_ = std::move(feedbackText);
     finalMark_.reset();
 }
 
